@@ -1,14 +1,21 @@
 #define START_BYTE 0xAA
 #define END_BYTE 0x55
+#define ACK_BYTE 0x06
+#define NACK_BYTE 0x15
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
+  pinMode(9, INPUT_PULLUP);
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
   receivePacket();
+  if (digitalRead(9) == 0) {
+    send_value_tx(1, 50);
+    delay(500);
+  }
 }
 
 
@@ -90,4 +97,38 @@ void receivePacket() {
         break;
     }
   }
+}
+
+//---------------------------------------------------------------------
+// Função para enviar um pacote
+void sendPacket(byte command, byte *params, byte param_len) {
+  byte packet_len = 1 + param_len + 1 + 1 + 1;  // COMMAND + PARAMETERS + CRC + ACK + END_BYTE
+  Serial.write(START_BYTE);
+  Serial.write(packet_len);
+  Serial.write(command);
+
+  for (int i = 0; i < param_len; i++) {
+    Serial.write(params[i]);
+  }
+
+  // CRC calcula sobre COMMAND+PARAMETERS
+  byte crc_data[1 + param_len];
+  crc_data[0] = command;
+  for (int i = 0; i < param_len; i++) {
+    crc_data[1 + i] = params[i];
+  }
+  byte crc = calcCRC(crc_data, 1 + param_len);
+  Serial.write(crc);
+
+  Serial.write(ACK_BYTE);  // Enviando ACK junto ao pacote
+  Serial.write(END_BYTE);
+}
+/*****************************************************************************
+ * TRANSMISSAO NO SERIAL MONITOR
+ */
+void send_value_tx(uint8_t BufferTeste, uint8_t BufferTesteLenght) {
+  byte params[1] = { BufferTesteLenght };
+  sendPacket(BufferTeste, params, 1);
+
+  // Serial.write((uint8_t *)&BufferTeste, sizeof(BufferTesteLenght));
 }
