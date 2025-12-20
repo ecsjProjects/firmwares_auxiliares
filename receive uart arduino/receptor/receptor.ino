@@ -18,10 +18,8 @@ void loop() {
   }
 }
 
-
-
-byte calcCRC(byte *data, byte len) {
-  byte crc = 0;
+uint8_t calcCRC(uint8_t *data, uint8_t len) {
+  uint8_t crc = 0;
   for (int i = 0; i < len; i++) {
     crc ^= data[i];
   }
@@ -36,10 +34,14 @@ void receivePacket() {
                 READ_CRC,
                 READ_ACK,
                 WAIT_END } state = WAIT_START;
-  static byte packet_len, command, params[20], param_len, crc, ack, bytes_read;
+  static uint8_t packet_len, command, param_len, crc, ack, bytes_read;
+  static uint8_t params[26];
+  uint8_t crc_data[3];
+  uint8_t calc_crc;
 
+  //START_BYTE + PACKEGE_LEN + COMMAND + PARAMETERS + CRC + ACK + END_BYTE
   while (Serial.available()) {
-    byte b = Serial.read();
+    uint8_t b = Serial.read();
 
     switch (state) {
       case WAIT_START:
@@ -52,7 +54,7 @@ void receivePacket() {
         break;
       case READ_CMD:
         command = b;
-        param_len = packet_len - (1 + 1 + 1 + 1);  // COMMAND, CRC, ACK, END_BYTE
+        param_len = 1;  //packet_len - (1 + 1 + 1 + 1);  // COMMAND, CRC, ACK, END_BYTE
         bytes_read = 0;
         state = param_len > 0 ? READ_PARAMS : READ_CRC;
         break;
@@ -71,10 +73,10 @@ void receivePacket() {
       case WAIT_END:
         if (b == END_BYTE) {
           // Valida CRC
-          byte crc_data[1 + param_len];
+          
           crc_data[0] = command;
-          for (int i = 0; i < param_len; i++) crc_data[1 + i] = params[i];
-          byte calc_crc = calcCRC(crc_data, 1 + param_len);
+          for (uint8_t i = 0; i < param_len; i++) crc_data[1 + i] = params[i];
+          uint8_t calc_crc = calcCRC(crc_data, 1 + param_len);
 
           if (calc_crc == crc) {
             // Pacote válido!
@@ -84,10 +86,12 @@ void receivePacket() {
             // Serial.print("ACK: ");
             // Serial.println(ack);
             Serial.print("Parametros: ");
-            for (int i = 0; i < param_len; i++) {
-              Serial.print(params[i]);
-              Serial.print(' ');
-            }
+            Serial.print(params[0]);
+            Serial.print(' ');
+            // for (int i = 0; i < param_len; i++) {
+            //   Serial.print(params[i]);
+            //   Serial.print(' ');
+            // }
             Serial.println();
           } else {
             Serial.println("CRC inválido!");
@@ -101,8 +105,8 @@ void receivePacket() {
 
 //---------------------------------------------------------------------
 // Função para enviar um pacote
-void sendPacket(byte command, byte *params, byte param_len) {
-  byte packet_len = 1 + param_len + 1 + 1 + 1;  // COMMAND + PARAMETERS + CRC + ACK + END_BYTE
+void sendPacket(uint8_t command, uint8_t *params, uint8_t param_len) {
+  uint8_t packet_len = 1 + param_len + 1 + 1 + 1;  // COMMAND + PARAMETERS + CRC + ACK + END_BYTE
   Serial.write(START_BYTE);
   Serial.write(packet_len);
   Serial.write(command);
@@ -112,12 +116,12 @@ void sendPacket(byte command, byte *params, byte param_len) {
   }
 
   // CRC calcula sobre COMMAND+PARAMETERS
-  byte crc_data[1 + param_len];
+  uint8_t crc_data[1 + param_len];
   crc_data[0] = command;
   for (int i = 0; i < param_len; i++) {
     crc_data[1 + i] = params[i];
   }
-  byte crc = calcCRC(crc_data, 1 + param_len);
+  uint8_t crc = calcCRC(crc_data, 1 + param_len);
   Serial.write(crc);
 
   Serial.write(ACK_BYTE);  // Enviando ACK junto ao pacote
@@ -127,7 +131,7 @@ void sendPacket(byte command, byte *params, byte param_len) {
  * TRANSMISSAO NO SERIAL MONITOR
  */
 void send_value_tx(uint8_t BufferTeste, uint8_t BufferTesteLenght) {
-  byte params[1] = { BufferTesteLenght };
+  uint8_t params[1] = { BufferTesteLenght };
   sendPacket(BufferTeste, params, 1);
 
   // Serial.write((uint8_t *)&BufferTeste, sizeof(BufferTesteLenght));
