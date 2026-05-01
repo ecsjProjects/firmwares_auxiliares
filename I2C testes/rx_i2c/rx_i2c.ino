@@ -2,7 +2,7 @@
 
 void setup() {
   // Wire.begin(8); // Inicia o I2C como escravo com endereço 8
-  Wire.begin(1); // Inicia o I2C como escravo com endereço 8
+  Wire.begin(12); // Inicia o I2C como escravo com endereço 8
   Wire.onReceive(receberDados); // Registra a função de callback para recepção
   Serial.begin(9600); // Para depuração
 }
