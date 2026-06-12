@@ -35,7 +35,7 @@ void setup() {
   pinMode(MUX_LEDS_LATCH_ALL, OUTPUT);
 
   Serial.begin(9600);
-  Serial1.begin(9600);
+  // Serial1.begin(9600);
 
   pinMode(ledPin, OUTPUT);
 }
