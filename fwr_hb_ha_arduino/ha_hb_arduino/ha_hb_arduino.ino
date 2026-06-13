@@ -1,26 +1,50 @@
+#include <stdint.h>
+
+#define ENABLE_LED 0xFFU
+#define DESABLE_LED 0x00U
+
+#define DEBOUNCE_TIME 150U
+#define TIME_INIT 2000U
+
+#define SHIFT_VALUE 4U
+
+// Rastreio de botoes
+enum{
+  BOTAO_1 = 0x00U,
+  BOTAO_2,
+  BOTAO_3,
+  BOTAO_4,
+  BOTAO_5,
+  BOTAO_6,
+  BOTAO_7,
+  BOTAO_8,
+  DATA_EXP2,
+  CLOCK_PIN2,
+  DATA_EXP1,
+  CLOCK_PIN1,
+  LATCH_PIN
+};
 
 // --- Definição dos Pinos dos Expanders ---
-const int LATCH_PIN = 12;  // Pino ST_CP dos dois CIs
-const int CLOCK_PIN1 = 11;  // Pino SH_CP dos dois CIs
-const int DATA_EXP1 = 10;  // Pino DS do Expander 1 (LEDs 1 a 4)
-const int DATA_EXP2 = 8;   //9;  // Pino DS do Expander 2 (LEDs 5 a 8)
-const int CLOCK_PIN2 = 9;  //8; // Pino SH_CP dos dois CIs
+// const uint8_t LATCH_PIN = 12; // Pino ST_CP dos dois CIs
+// const uint8_t CLOCK_PIN1 = 11;// Pino SH_CP dos dois CIs
+// const uint8_t DATA_EXP1 = 10; // Pino DS do Expander 1 (LEDs 1 a 4)
+// const uint8_t DATA_EXP2 = 8;  // Pino DS do Expander 2 (LEDs 5 a 8)
+// const uint8_t CLOCK_PIN2 = 9; // Pino SH_CP dos dois CIs
 
 // --- Variáveis de Controle ---
 byte estadoBotoesAnt[8] = { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH };
-byte estadoLedsExp1 = 0x00;  // Armazena o estado dos LEDs do Expander 1 (em bits)
-byte estadoLedsExp2 = 0x00;  // Armazena o estado dos LEDs do Expander 2 (em bits)
+byte estadoLedsExp1 = ENABLE_LED;  // Armazena o estado dos LEDs do Expander 1 (em bits)
+byte estadoLedsExp2 = ENABLE_LED;  // Armazena o estado dos LEDs do Expander 2 (em bits)
 
 // Tempo para debounce simples
-unsigned long ultimoDebounce = 0;
-const int tempoDebounce = 150;  //50;
+unsigned long ultimoDebounce = 0x00U;
 
 void setup() {
-  // Configura os pinos 0 a 7 como ENTRADA com Pull-up interno
+  // Configura os pinos 0 a 7 como ENTRADA
   // (O botão deve mandar GND/0V quando pressionado)
-  for (int i = 0; i <= 7; i++) {
+  for (uint8_t i = BOTAO_1; i <= BOTAO_8; i++) {
     pinMode(i, INPUT);
-    // Serial.begin(9600);
   }
 
   // Configura os pinos de saída para os registradores de deslocamento
@@ -32,32 +56,33 @@ void setup() {
 
   // Inicializa os LEDs desligados
   atualizarExpanders();
+
+  delay(TIME_INIT);
+
+  estadoLedsExp1 = DESABLE_LED;
+  estadoLedsExp2 = DESABLE_LED;
+  atualizarExpanders();
 }
 
 void loop() {
   // Debounce não-bloqueante
-  if ((millis() - ultimoDebounce) > tempoDebounce) {
+  if ((millis() - ultimoDebounce) > DEBOUNCE_TIME) {
 
     // Varre os 8 botões (pinos 0 a 7)
-    for (int i = 0; i < 8; i++) {
-      int leitura = digitalRead(i);
+    for (uint8_t i = BOTAO_1; i <= BOTAO_8; i++) {
+      uint8_t leitura = digitalRead(i);
 
       // Detecta a transição: Estava pressionado (LOW) e foi SOLTADO (HIGH)
       if (leitura == HIGH && estadoBotoesAnt[i] == LOW) {
 
-         if (i < 4) {
+         if (i < BOTAO_5) {
           // Botões 0 a 3 (1 a 4 físicos) mudam o Expander 1
           // Inverte o bit correspondente usando XOR (^)
-          // estadoLedsExp1 ^= (1 << i);
-          estadoLedsExp2 ^= (1 << i);
-          // Serial.println("Botões HA");
-
+          estadoLedsExp2 ^= (1U << i);
         } else {
           // Botões 4 a 7 (5 a 8 físicos) mudam o Expander 2
           // i - 4 ajusta a posição do bit para os pinos 0 a 3 do segundo CI
-          // estadoLedsExp2 ^= (1 << (i - 4));
-          estadoLedsExp1 ^= (1 << (i - 4));
-          // Serial.println("Botões HB");
+          estadoLedsExp1 ^= (1U << (i - SHIFT_VALUE));
         }
 
         // Atualiza a saída física dos LEDs
