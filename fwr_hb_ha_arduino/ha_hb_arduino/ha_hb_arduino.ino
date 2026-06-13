@@ -25,13 +25,6 @@ enum{
   LATCH_PIN
 };
 
-// --- Definição dos Pinos dos Expanders ---
-// const uint8_t LATCH_PIN = 12; // Pino ST_CP dos dois CIs
-// const uint8_t CLOCK_PIN1 = 11;// Pino SH_CP dos dois CIs
-// const uint8_t DATA_EXP1 = 10; // Pino DS do Expander 1 (LEDs 1 a 4)
-// const uint8_t DATA_EXP2 = 8;  // Pino DS do Expander 2 (LEDs 5 a 8)
-// const uint8_t CLOCK_PIN2 = 9; // Pino SH_CP dos dois CIs
-
 // --- Variáveis de Controle ---
 byte estadoBotoesAnt[8] = { HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH, HIGH };
 byte estadoLedsExp1 = ENABLE_LED;  // Armazena o estado dos LEDs do Expander 1 (em bits)
