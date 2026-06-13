@@ -9,20 +9,18 @@
 
 #include "definitions.h"
 
-
 //***************************************************************************
 void setup() {
   // put your setup code here, to run once:
 
-  pinMode(SW_01, INPUT_PULLUP);
-  pinMode(SW_02, INPUT_PULLUP);
-  pinMode(SW_03, INPUT_PULLUP);
-  pinMode(SW_04, INPUT_PULLUP);
-  pinMode(SW_05, INPUT_PULLUP);
-  pinMode(SW_06, INPUT_PULLUP);
-  pinMode(SW_07, INPUT_PULLUP);
-  pinMode(SW_08, INPUT_PULLUP);
- 
+  pinMode(SW_01, INPUT);
+  pinMode(SW_02, INPUT);
+  pinMode(SW_03, INPUT);
+  pinMode(SW_04, INPUT);
+  pinMode(SW_05, INPUT);
+  pinMode(SW_06, INPUT);
+  pinMode(SW_07, INPUT);
+  pinMode(SW_08, INPUT);
 
   pinMode(MUX_LEDS_CLOCK_1, OUTPUT);
   pinMode(MUX_LEDS_DATA_1, OUTPUT);
@@ -47,8 +45,8 @@ void loop() {
 
   while (1) {
     readSwitches();
-    delay(0.5);
-    leds_operators();
+    delay(200);
+    // leds_operators();
 
     if (enable_serial == true) {
       enable_serial = false;
@@ -64,7 +62,7 @@ void loop() {
  * GLOBAL: STD_STATE
  */
 void readSwitches() {
- /* Studio - STD*/
+  /* Studio - STD*/
   /*SW_01 - STD_PGM */
   actualSW_01 = digitalRead(SW_01);
   if (SW_01_Old == false && actualSW_01 == true) {
@@ -80,6 +78,8 @@ void readSwitches() {
     cache_buffer[1] = (uint8_t)SW_01_Flag;
     enable_serial = true;
     status_buttons = 1u;
+    Serial.print("CH1: ");
+    Serial.println(SW_01_Flag);
   }
   SW_01_Old = actualSW_01;
 
@@ -95,9 +95,11 @@ void readSwitches() {
     SW_02_Flag = !SW_02_Flag;
 
     /*Posicao Vetor */
-    cache_buffer[2] = SW_02_Flag;
+    cache_buffer[2] = (uint8_t)SW_02_Flag;
     enable_serial = true;
     status_buttons = 2u;
+    Serial.print("CH2: ");
+    Serial.println(SW_02_Flag);
   }
   SW_02_Old = actualSW_02;
 
@@ -113,9 +115,11 @@ void readSwitches() {
     SW_03_Flag = !SW_03_Flag;
 
     /*Posicao Vetor */
-    cache_buffer[3] = SW_03_Flag;
+    cache_buffer[3] = (uint8_t)SW_03_Flag;
     enable_serial = true;
     status_buttons = 3u;
+    Serial.print("CH3: ");
+    Serial.println(SW_03_Flag);
   }
   SW_03_Old = actualSW_03;
 
@@ -131,9 +135,11 @@ void readSwitches() {
     SW_04_Flag = !SW_04_Flag;
 
     /*Posicao Vetor */
-    cache_buffer[4] = SW_04_Flag;
+    cache_buffer[4] = (uint8_t)SW_04_Flag;
     enable_serial = true;
     status_buttons = 4u;
+    Serial.print("CH4: ");
+    Serial.println(SW_04_Flag);
   }
   SW_04_Old = actualSW_04;
 
@@ -149,9 +155,11 @@ void readSwitches() {
     SW_05_Flag = !SW_05_Flag;
 
     /*Posicao Vetor */
-    cache_buffer[5] = SW_05_Flag;
+    cache_buffer[5] = (uint8_t)SW_05_Flag;
     enable_serial = true;
     status_buttons = 5u;
+    Serial.print("CH5: ");
+    Serial.println(SW_05_Flag);
   }
   SW_05_Old = actualSW_05;
 
@@ -167,9 +175,11 @@ void readSwitches() {
     SW_06_Flag = !SW_06_Flag;
 
     /*Posicao Vetor */
-    cache_buffer[6] = SW_06_Flag;
+    cache_buffer[6] = (uint8_t)SW_06_Flag;
     enable_serial = true;
     status_buttons = 6u;
+    Serial.print("CH6: ");
+    Serial.println(SW_06_Flag);
   }
   SW_06_Old = actualSW_06;
 
@@ -186,9 +196,11 @@ void readSwitches() {
     SW_07_Flag = !SW_07_Flag;
 
     /*Posicao Vetor */
-    cache_buffer[7] = SW_07_Flag;
+    cache_buffer[7] = (uint8_t)SW_07_Flag;
     enable_serial = true;
     status_buttons = 7u;
+    Serial.print("CH7: ");
+    Serial.println(SW_07_Flag);
   }
   SW_07_Old = actualSW_07;
 
@@ -204,13 +216,14 @@ void readSwitches() {
     SW_08_Flag = !SW_08_Flag;
 
     /*Posicao Vetor */
-    cache_buffer[8] = SW_08_Flag;
+    cache_buffer[8] = (uint8_t)SW_08_Flag;
     enable_serial = true;
     status_buttons = 8u;
+    Serial.print("CH8: ");
+    Serial.println(SW_08_Flag);
   }
   SW_08_Old = actualSW_08;
 }
-
 
 /*****************************************************************************
  * FUNCAO INICIALIZACAO DE VARIAVEIS
@@ -226,7 +239,6 @@ void init_variables() {
   actualSW_07 = false;  // CR_PGM
   actualSW_08 = false;  // CR_AUX
 
-
   SW_01_Old = true;  // STD_PGM
   SW_02_Old = true;  // STD_AUX
   SW_03_Old = true;  // STD_STM
@@ -235,7 +247,6 @@ void init_variables() {
   SW_06_Old = true;  // STD_TALK
   SW_07_Old = true;  // CR_PGM
   SW_08_Old = true;  // CR_AUX
-
 
   /* Flag Booleanas */
   SW_01_Detect = false;  // STD_PGM
@@ -247,7 +258,6 @@ void init_variables() {
   SW_07_Detect = false;  // CR_PGM
   SW_08_Detect = false;  // CR_AUX
 
-
   SW_01_Flag = false;  // STD_PGM
   SW_02_Flag = false;  // STD_AUX
   SW_03_Flag = false;  // STD_STM
@@ -257,11 +267,8 @@ void init_variables() {
   SW_07_Flag = false;  // CR_PGM
   SW_08_Flag = false;  // CR_AUX
 
-
   enable_serial = true;
 }
-
-
 
 /*****************************************************************************
  * FUNCAO DE ACIONAMENTO DOS LEDS STD

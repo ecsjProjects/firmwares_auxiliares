@@ -7,26 +7,19 @@
 #define AJUSTE_VALUE 300u
 #define AJUSTE_VALUE1 400u
 
-#define MUX_LEDS_CLOCK_1 15u
-#define MUX_LEDS_DATA_1 14u
-#define MUX_LEDS_CLOCK_2 13u
-#define MUX_LEDS_DATA_2 12u
-#define MUX_LEDS_CLOCK_3 11u
-#define MUX_LEDS_DATA_3 10u
-#define MUX_LEDS_CLOCK_4 9u
-#define MUX_LEDS_DATA_4 8
-#define MUX_LEDS_LATCH_ALL 7u
+#define MUX_LEDS_CLOCK_1 8u
+#define MUX_LEDS_DATA_1 9u
+#define MUX_LEDS_CLOCK_2 10u
+#define MUX_LEDS_DATA_2 11u
+#define MUX_LEDS_LATCH_ALL 12u
 
-#define START_BYTE 0xAA // 170
-#define END_BYTE 0x55   // 85
-#define ACK_BYTE 0x06   // 06
 
 const int ledPin = 13u;
 
 /* Enuns */
 enum entradas
 {
-  SW_01 = 22, // STD_PGM
+  SW_01 = 0, // STD_PGM
   SW_02,      // STD_AUX
   SW_03,      // STD_STM
   SW_04,      // STD_EX1
@@ -34,22 +27,6 @@ enum entradas
   SW_06,      // STD_TALK
   SW_07,      // CR_PGM
   SW_08,      // CR_AUX
-  SW_09,      // CR_STM
-  SW_10,     // CR_EX1
-  SW_11,     // CR_EX2
-  SW_12,     // CR_CUE
-  SW_13,     // PH_PGM
-  SW_14,     // PH_AUX
-  SW_15,     // PH_STM
-  SW_16,     // PH_EX1
-  SW_17,     // PH_EX2
-  SW_18,     // PH_CUE
-  SW_19,     // PH_SPLIT
-  SW_20,     // F_MON
-  SW_21,     // STM_STM
-  SW_22,     // STM_AUX
-  SW_23,     // STM_EX1
-  SW_24      // STM_EX2
 };
 
 enum stages
